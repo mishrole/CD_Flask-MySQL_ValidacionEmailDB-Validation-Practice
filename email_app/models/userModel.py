@@ -28,6 +28,25 @@ class User:
         query = "INSERT INTO users (email, created_at, updated_at) VALUES (%(email)s, NOW(), NOW());"
         return connectToMySQL('email_validation_schema').query_db(query, data)
 
+    @classmethod
+    def findUserByEmail(cls, data):
+        query = "SELECT * FROM users WHERE email = %(email)s;"
+        results = connectToMySQL('email_validation_schema').query_db(query, data)
+
+        user = None
+
+        if results:
+            print(results)
+            if len(results) > 0:
+                user = cls(results[0])
+
+        return user
+
+    @classmethod
+    def delete(cls, data):
+        query = "DELETE FROM users WHERE id = %(userId)s"
+        return connectToMySQL('email_validation_schema').query_db(query, data)
+
     @staticmethod
     def validateUser(user):
         is_valid = True
@@ -36,6 +55,10 @@ class User:
 
         if not EMAIL_REGEX.match(email):
             flash('Invalid email address!', 'error')
+            is_valid = False
+        
+        if User.findUserByEmail({'email': email}) != None:
+            flash('Email address is already taken!', 'error')
             is_valid = False
 
         if is_valid:

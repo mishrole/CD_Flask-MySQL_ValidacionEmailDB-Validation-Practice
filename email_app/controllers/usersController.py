@@ -27,13 +27,21 @@ def create_user():
 
     result = userModel.User.save(data)
 
-    print(result)
-
     if result:
         session['email'] = request.form.get('email')
         return redirect('/success')
     else:
         return redirect('/')
+
+@app.route('/delete_user/<int:id>', methods=['POST'])
+def delete_user(id):
+
+    data = {
+        'userId': id
+    }
+
+    userModel.User.delete(data)
+    return redirect('/success')
 
 @app.route('/success', methods=['GET'])
 def success():
